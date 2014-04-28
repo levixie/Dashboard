@@ -88,4 +88,8 @@ TEMPLATE_DIRS = (
     BASE_DIR
 )
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
+
 CONFIG_FILE = os.path.join(BASE_DIR, 'supervisord.conf')
