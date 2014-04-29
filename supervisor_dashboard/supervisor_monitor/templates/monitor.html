@@ -4,38 +4,7 @@
     {% load staticfiles %}
     <link href="{% static "css/supervisor.css" %}" rel="stylesheet" type="text/css">
     <script src="http://code.jquery.com/jquery-2.1.0.min.js" type="text/javascript"></script>
-    <style>
-    h1{
-        color: #f1f1f1;
-        background: #1f1f1f;
-    }
-    .machine td{
-        font-size: 12pt;
-        font-weight: bold;
-        border-top: 1px solid black;
-    }
-    table{
-        min-width: 500pt;
-        margin-left: 40pt;
-    }
-    th{
-        background: #1f1f1f;
-        color: #f1f1f1;
-    }
-    a{
-        color: #f11f11;
-    }
-    td.RUNNING{
-        background: #1f911f;
-        font-weight: bold;
-        color: #f1f1f1;
-    }
-    td.STOPPED{
-        background: #9f111f;
-        font-weight: bold;
-        color: #f1f1f1;
-    }
-    </style>
+
     <script>
         function refresh(id) {
             $.ajax({
@@ -56,7 +25,7 @@
             var table = $("<table>");
             var tbody = $("<tbody>");
             tbody.appendTo(table);
-            var row = "<td colspan='6'>" + server['name'] + "&nbsp;<a href='#' onClick=refresh('"+id+"')>refresh</a></td>";
+            var row = "<td colspan='6'>" +  buttons.prop('outerHTML') + "</td>";
             table.append($("<tr class='machine'>"+row+"</tr>"));
             for(var i=0; i<status.length; i++){
                 var program = status[i];
@@ -76,7 +45,7 @@
                 table.append($("<tr>"+row+"</tr>"));
             }
             server_dashboard.empty();
-            server_dashboard.append(buttons);
+            server_dashboard.append(server['name']);
             server_dashboard.append(table);
          };
          function control_program(server_id, program_id, command){
