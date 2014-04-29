@@ -48,6 +48,11 @@
         };
         function render(id, status, server) {
             var server_dashboard = $("#server_dashboard_"+id);
+            var buttons = $('<ul id="buttons">');
+            buttons.addClass('clr');
+            buttons.append('<li id="refresh"><a href="index.html?action=refresh">&nbsp;</a></li>');
+            buttons.append('<li id="restart_all"><a href="index.html?action=restartall">&nbsp;</a></li>');
+            buttons.append('<li id="stop_all"><a href="index.html?action=stopall">&nbsp;</a></li>');
             var table = $("<table>");
             var tbody = $("<tbody>");
             tbody.appendTo(table);
@@ -71,6 +76,7 @@
                 table.append($("<tr>"+row+"</tr>"));
             }
             server_dashboard.empty();
+            server_dashboard.append(buttons);
             server_dashboard.append(table);
          };
          function control_program(server_id, program_id, command){

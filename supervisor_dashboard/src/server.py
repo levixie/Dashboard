@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from xmlrpclib import Fault
 from urlparse import urlparse
+from httplib import CannotSendRequest
 import socket
 
 from django.utils.datastructures import SortedDict
@@ -17,13 +18,13 @@ class Server(object):
     def refresh(self):
         try:
             self.status = SortedDict()
-            for process in self.connection.supervisor.getAllProcessInfo():
-                key = "%s:%s" % (process['group'], process['name'])
-                process['id'] = key
-                process['human_name'] = process['name']
-                if process['name'] != process['group']:
-                    process['human_name'] = "%s:%s" % (process['group'], process['name'])
-                self.status[key] = process
+            for program in self.connection.supervisor.getAllProcessInfo():
+                key = "%s:%s" % (program['group'], program['name'])
+                program['id'] = key
+                program['human_name'] = program['name']
+                if program['name'] != program['group']:
+                    program['human_name'] = "%s:%s" % (program['group'], program['name'])
+                self.status[key] = program
         except (Fault, socket.timeout):
             return False
         except:
