@@ -33,10 +33,14 @@ def query(request):
     action = request.GET['action']
     response_dict = {}
     if action == 'refresh':
-        server.refresh()
-        response_dict['status'] = server.status.values()
-        response_dict['status'].sort(key=lambda x: (x['group'], x['name']))
+        if server.refresh():
+            response_dict['status'] = server.status.values()
+            response_dict['status'].sort(key=lambda x: (x['group'], x['name']))
+        else:
+            response_dict['status'] = None
+
         response_dict['server'] = {'name': server.name, 'sid': sid}
+
     if action in ('start', 'stop', 'restart'):
         program = request.GET['program']
         getattr(server, action)(program)

@@ -25,6 +25,8 @@ class Server(object):
                 if program['name'] != program['group']:
                     program['human_name'] = "%s:%s" % (program['group'], program['name'])
                 self.status[key] = program
+
+            return True
         except (Fault, socket.timeout):
             return False
         except:

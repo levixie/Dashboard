@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
     <title>supervisord dashboard</title>
@@ -17,35 +18,55 @@
         };
         function render(id, status, server) {
             var server_dashboard = $("#server_dashboard_"+id);
+            if (!status) {
+                var buttons = $('<ul id="buttons">');
+                buttons.addClass('clr');
+                buttons.append('<li id="refresh"><a href="index.html?action=refresh">&nbsp;</a></li>');
+                buttons.append('<li id="machine_name"><a href="index.html?action=stopall">&nbsp;'+server['name']+' is not running!</a></li>');
+
+                server_dashboard.append(buttons);
+                return;
+            }
             var buttons = $('<ul id="buttons">');
             buttons.addClass('clr');
             buttons.append('<li id="refresh"><a href="index.html?action=refresh">&nbsp;</a></li>');
             buttons.append('<li id="restart_all"><a href="index.html?action=restartall">&nbsp;</a></li>');
             buttons.append('<li id="stop_all"><a href="index.html?action=stopall">&nbsp;</a></li>');
-            var table = $("<table>");
+            buttons.append('<li id="machine_name"><a href="index.html?action=stopall">&nbsp;'+server['name']+'</a></li>');
+            var table = $("<table>").attr('cellspacing','0');
+            var thead = $("<thead>").
+                            append($("<th>").addClass('state').text('State')).
+                            append($("<th>").addClass('desc').text('Description')).
+                            append($("<th>").addClass('name').text('Name')).
+                            append($("<th>").addClass('action').text('Action'));
+            thead.appendTo(table);
             var tbody = $("<tbody>");
             tbody.appendTo(table);
-            var row = "<td colspan='6'>" +  buttons.prop('outerHTML') + "</td>";
             table.append($("<tr class='machine'>"+row+"</tr>"));
             for(var i=0; i<status.length; i++){
                 var program = status[i];
                 var row = "";
-                row += "<td width='30%'>"+program["human_name"]+"</td>";
-                row += "<td class='"+program['statename']+"'>"+program["statename"]+"</td>";
-                row += "<td>"+program["description"]+"</td>";
+
+                row += "<td class='state'>"+program["statename"]+"</td>";
+                row += "<td class='desc'>"+program["description"]+"</td>";
+                row += "<td class='name'>"+program["human_name"]+"</td>";
                 if (program['state'] == "{{ constants.running }}"){
-                    row += "<td>start</td>";
-                    row += "<td><a href='#' onClick=control_program("+id+",'"+program['id']+"','stop')>stop</a></td>";
-                    row += "<td><a href='#' onClick=control_program("+id+",'"+program['id']+"','restart')>restart</a></td>";
+                    row += "<td class='action'><ul>";
+                    row += "<li>start</li>";
+                    row += "<li><a href='#' onClick=control_program("+id+",'"+program['id']+"','stop')>stop</li>";
+                    row += "<li><a href='#' onClick=control_program("+id+",'"+program['id']+"','restart')>restart</li>";
+                    row += "</ul></td>";
                 } else {
-                    row += "<td><a href='#' onClick=control_program("+id+",'"+program['id']+"','start')>start</a></td>";
-                    row += "<td>stop</td>";
-                    row += "<td>restart</td>";
+                    row += "<td class='action'><ul>";
+                    row += "<li><a href='#' onClick=control_program("+id+",'"+program['id']+"','start')>start</li>";
+                    row += "<li>stop</li>";
+                    row += "<li>restart</li>";
+                    row += "</ul></td>";
                 }
                 table.append($("<tr>"+row+"</tr>"));
             }
             server_dashboard.empty();
-            server_dashboard.append(server['name']);
+            server_dashboard.append(buttons);
             server_dashboard.append(table);
          };
          function control_program(server_id, program_id, command){
@@ -76,17 +97,9 @@
             <img alt="Supervisor status" src="{% static "imgs/supervisor.gif" %}">
         </div>
 
-        <div>
-            <div>
-                <a href="#" onClick=refresh_all()>refresh all</a>
-            </div>
-
-            {% for server in servers.values %}
-            <div>
-                <div id="server_dashboard_{{ server.sid }}"></div>
-            </div>
-            {% endfor %}
-        </div>
+        {% for server in servers.values %}
+        <div id="server_dashboard_{{ server.sid }}"></div>
+        {% endfor %}
     </div>
 </body>
 </html>
