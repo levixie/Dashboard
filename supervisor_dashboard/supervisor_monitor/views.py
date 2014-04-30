@@ -31,6 +31,7 @@ def query(request):
     sid = request.GET['server']
     server = backend.servers[sid]
     action = request.GET['action']
+    print sid, action
     response_dict = {}
     if action == 'refresh':
         if server.refresh():
@@ -41,8 +42,12 @@ def query(request):
 
         response_dict['server'] = {'name': server.name, 'sid': sid}
 
-    if action in ('start', 'stop', 'restart'):
+    elif action in ('start', 'stop', 'restart'):
         program = request.GET['program']
         getattr(server, action)(program)
+
+    elif action in ('start_all', 'stop_all', 'restart_all'):
+        getattr(server, action)()
+
 
     return HttpResponse(json.dumps(response_dict), mimetype='application/javascript')

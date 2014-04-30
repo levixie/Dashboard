@@ -20,19 +20,27 @@
             var server_dashboard = $("#server_dashboard_"+id);
             if (!status) {
                 var buttons = $('<ul id="buttons">');
-                buttons.addClass('clr');
-                buttons.append('<li id="refresh"><a href="index.html?action=refresh">&nbsp;</a></li>');
-                buttons.append('<li id="machine_name"><a href="index.html?action=stopall">&nbsp;'+server['name']+' is not running!</a></li>');
+                buttons.addClass('clr').append(server['name']+' is not running');
+                buttons.
+                    append($("<li>").attr("id", "refresh").
+                        append($("<a>").attr("link", "#").attr("onClick", "refresh(" + id + ")").html('&nbsp;')));
 
                 server_dashboard.append(buttons);
                 return;
             }
             var buttons = $('<ul id="buttons">');
-            buttons.addClass('clr');
-            buttons.append('<li id="refresh"><a href="index.html?action=refresh">&nbsp;</a></li>');
-            buttons.append('<li id="restart_all"><a href="index.html?action=restartall">&nbsp;</a></li>');
-            buttons.append('<li id="stop_all"><a href="index.html?action=stopall">&nbsp;</a></li>');
-            buttons.append('<li id="machine_name"><a href="index.html?action=stopall">&nbsp;'+server['name']+'</a></li>');
+            buttons.addClass('clr').append(server['name']);
+            buttons.append($("<li>").attr("id", "refresh").
+                        append($("<a>").attr("link", "#").attr("onClick", "refresh(" + id + ")").html('&nbsp;'))).
+                    append($("<li>").attr("id", "restart_all").
+                        append($("<a>").attr("link", "#").attr("onClick", "control_server(" + id + ", 'restart_all')").html("&nbsp;"))).
+                    append($("<li>").attr("id", "stop_all").
+                        append($("<a>").attr("link", "#").attr("onClick", "control_server(" + id + ", 'stop_all')").html("&nbsp;")));
+
+
+                    // '<li id="restart_all"><a href="#" onClick=control_server(' + id + ', "restart_all")>&nbsp;</li>'+
+                    // '<li id="stop_all"><a href="#" onClick=control_server(' + id + ', "stop_all")>&nbsp;</a></li>'+
+                    // '<li id="machine_name"><a href="index.html?action=stopall">&nbsp;'+server['name']+'</a></li>';
             var table = $("<table>").attr('cellspacing','0');
             var thead = $("<thead>").
                             append($("<th>").addClass('state').text('State')).
@@ -47,20 +55,21 @@
                 var program = status[i];
                 var row = "";
 
-                row += "<td class='state'>"+program["statename"]+"</td>";
+                if (program['state'] == "{{ constants.running }}"){
+                    row += "<td class='state'><span class='statusrunning'>"+program["statename"]+"</span></td>";
+                } else {
+                    row += "<td class='state'><span class='statusnominal'>"+program["statename"]+"</span></td>";
+                }
                 row += "<td class='desc'>"+program["description"]+"</td>";
                 row += "<td class='name'>"+program["human_name"]+"</td>";
                 if (program['state'] == "{{ constants.running }}"){
                     row += "<td class='action'><ul>";
-                    row += "<li>start</li>";
                     row += "<li><a href='#' onClick=control_program("+id+",'"+program['id']+"','stop')>stop</li>";
                     row += "<li><a href='#' onClick=control_program("+id+",'"+program['id']+"','restart')>restart</li>";
                     row += "</ul></td>";
                 } else {
                     row += "<td class='action'><ul>";
                     row += "<li><a href='#' onClick=control_program("+id+",'"+program['id']+"','start')>start</li>";
-                    row += "<li>stop</li>";
-                    row += "<li>restart</li>";
                     row += "</ul></td>";
                 }
                 table.append($("<tr>"+row+"</tr>"));
@@ -78,6 +87,16 @@
                 dataType: 'json',
             });
          };
+         function control_server(server_id, command){
+            $.ajax({
+                url: "{{ query_url }}",
+                data: {'server': server_id, 'action': command},
+                success: function (data) { refresh(server_id); },
+                error: function(){ alert('fail'); },
+                dataType: 'json',
+            });
+         };
+ 
          function refresh_all(){
              {% for server in servers.values %}
                 refresh('{{ server.sid }}');

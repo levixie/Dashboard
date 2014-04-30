@@ -25,32 +25,38 @@ class Server(object):
                 if program['name'] != program['group']:
                     program['human_name'] = "%s:%s" % (program['group'], program['name'])
                 self.status[key] = program
-
             return True
         except (Fault, socket.timeout):
             return False
         except:
             return False
 
-    def stop(self, name):
+    def stop(self, name, wait=True):
         try:
-            return self.connection.supervisor.stopProcess(name)
+            return self.connection.supervisor.stopProcess(name, wait)
         except Fault, e:
             if e.faultString.startswith('NOT_RUNNING'):
                 return False
             raise
 
-    def start(self, name):
+    def start(self, name, wait=True):
         try:
-            return self.connection.supervisor.startProcess(name)
+            return self.connection.supervisor.startProcess(name, wait)
         except Fault, e:
             if e.faultString.startswith('ALREADY_STARTED'):
                 return False
             raise
 
-    def start_all(self):
-        return self.connection.supervisor.startAllProcesses()
+    def start_all(self, wait=True):
+        return self.connection.supervisor.startAllProcesses(wait)
 
-    def restart(self, name):
+    def stop_all(self, wait=True):
+        return self.connection.supervisor.stopAllProcesses(wait)
+
+    def restart_all(self, wait=True):
+        self.stop_all(wait)
+        return self.start_all(wait)
+
+    def restart(self, name, wait=True):
         self.stop(name)
-        return self.start(name)
+        return self.start(name, wait)
