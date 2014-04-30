@@ -25,6 +25,7 @@
                     append($("<li>").attr("id", "refresh").
                         append($("<a>").attr("link", "#").attr("onClick", "refresh(" + id + ")").html('&nbsp;')));
 
+                server_dashboard.empty();
                 server_dashboard.append(buttons);
                 return;
             }
@@ -55,11 +56,14 @@
                 var program = status[i];
                 var row = "";
 
-                if (program['state'] == "{{ constants.running }}"){
+                if (program['state'] == "{{ constants.running }}") {
                     row += "<td class='state'><span class='statusrunning'>"+program["statename"]+"</span></td>";
-                } else {
+                } else if (program['state'] == "{{ constants.stop }}") {
                     row += "<td class='state'><span class='statusnominal'>"+program["statename"]+"</span></td>";
+                } else if (program['state'] == "{{ constants.fatal }}") {
+                    row += "<td class='state'><span class='statuserror'>"+program["statename"]+"</span></td>";
                 }
+
                 row += "<td class='desc'>"+program["description"]+"</td>";
                 row += "<td class='name'>"+program["human_name"]+"</td>";
                 if (program['state'] == "{{ constants.running }}"){

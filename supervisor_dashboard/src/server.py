@@ -14,17 +14,19 @@ class Server(object):
         self.connection = TimeoutServerProxy(connection_string, timeout=2)
         self.status = SortedDict()
         self.sid = sid
+        self.connection_string = connection_string
 
     def refresh(self):
         try:
-            self.status = SortedDict()
+            status = SortedDict()
             for program in self.connection.supervisor.getAllProcessInfo():
                 key = "%s:%s" % (program['group'], program['name'])
                 program['id'] = key
                 program['human_name'] = program['name']
                 if program['name'] != program['group']:
                     program['human_name'] = "%s:%s" % (program['group'], program['name'])
-                self.status[key] = program
+                status[key] = program
+            self.status = status    
             return True
         except (Fault, socket.timeout):
             return False
@@ -33,30 +35,47 @@ class Server(object):
 
     def stop(self, name, wait=True):
         try:
-            return self.connection.supervisor.stopProcess(name, wait)
+            self.connection.supervisor.stopProcess(name, wait)
+            return True
         except Fault, e:
-            if e.faultString.startswith('NOT_RUNNING'):
-                return False
-            raise
+            return False
 
     def start(self, name, wait=True):
         try:
-            return self.connection.supervisor.startProcess(name, wait)
+            self.connection.supervisor.startProcess(name, wait)
+            return True
         except Fault, e:
-            if e.faultString.startswith('ALREADY_STARTED'):
-                return False
-            raise
+            return False
 
     def start_all(self, wait=True):
-        return self.connection.supervisor.startAllProcesses(wait)
+        try:
+            self.connection.supervisor.startAllProcesses(wait)
+            return True
+        except Fault,e:
+            print e
+            return False
 
     def stop_all(self, wait=True):
-        return self.connection.supervisor.stopAllProcesses(wait)
+        try:
+            self.connection.supervisor.stopAllProcesses(wait)
+            return True
+        except Fault,e:
+            print e
+            return False
 
     def restart_all(self, wait=True):
-        self.stop_all(wait)
-        return self.start_all(wait)
+        try:
+            self.stop_all(wait)
+            self.start_all(wait)
+            return True
+        except Fault, e:
+            print e
+            return False
 
     def restart(self, name, wait=True):
-        self.stop(name)
-        return self.start(name, wait)
+        try:
+            self.stop(name, wait)
+            self.start(name, wait)
+            return False
+        except Fault:
+            return False

@@ -4,13 +4,14 @@ from django.http import HttpResponse
 from django.conf import settings
 import os
 import json
+import sys
 
-from src.servers import Servers
+from src.servers import Servers, Server
 
 # Create your views here.
 
-backend = Servers()
 
+backend = Servers()
 def monitor(request):
     backend.refresh()
     return render(
@@ -22,6 +23,7 @@ def monitor(request):
             'constants': {
                 'stopped': 0,
                 'running': 20,
+                'fatal': 200,
             },
         }
     )
@@ -29,9 +31,8 @@ def monitor(request):
 
 def query(request):
     sid = request.GET['server']
-    server = backend.servers[sid]
+    server = Server(backend.servers[sid].connection_string, sid)
     action = request.GET['action']
-    print sid, action
     response_dict = {}
     if action == 'refresh':
         if server.refresh():
@@ -41,13 +42,16 @@ def query(request):
             response_dict['status'] = None
 
         response_dict['server'] = {'name': server.name, 'sid': sid}
+        backend.servers[sid] = server
 
     elif action in ('start', 'stop', 'restart'):
         program = request.GET['program']
         getattr(server, action)(program)
 
     elif action in ('start_all', 'stop_all', 'restart_all'):
-        getattr(server, action)()
-
+        try:
+            getattr(server, action)()
+        except:
+            print "Unexpected error:", sys.exc_info()[0]
 
     return HttpResponse(json.dumps(response_dict), mimetype='application/javascript')
