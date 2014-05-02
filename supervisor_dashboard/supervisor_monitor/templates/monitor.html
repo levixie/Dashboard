@@ -68,12 +68,12 @@
                 row += "<td class='name'>"+program["human_name"]+"</td>";
                 if (program['state'] == "{{ constants.running }}"){
                     row += "<td class='action'><ul>";
-                    row += "<li><a href='javascript:;"+id+",'"+program['id']+"','stop')>stop</li>";
-                    row += "<li><a href='javascript:;"+id+",'"+program['id']+"','restart')>restart</li>";
+                    row += "<li><a href='javascript:;' onClick=control_program("+id+",'"+program['id']+"','stop')>stop</li>";
+                    row += "<li><a href='javascript:;' onClick=control_program("+id+",'"+program['id']+"','restart')>restart</li>";
                     row += "</ul></td>";
                 } else {
                     row += "<td class='action'><ul>";
-                    row += "<li><a href='javascript:;"+id+",'"+program['id']+"','start')>start</li>";
+                    row += "<li><a href='javascript:;' onClick=control_program("+id+",'"+program['id']+"','start')>start</li>";
                     row += "</ul></td>";
                 }
                 table.append($("<tr>"+row+"</tr>"));
