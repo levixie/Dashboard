@@ -23,7 +23,7 @@
                 buttons.addClass('clr').append(server['name']+' is not running');
                 buttons.
                     append($("<li>").attr("id", "refresh").
-                        append($("<a>").attr("link", "#").attr("onClick", "refresh(" + id + ")").html('&nbsp;')));
+                        append($("<a>").attr("link", "javascript:;").attr("onClick", "refresh(" + id + ")").html('&nbsp;')));
 
                 server_dashboard.empty();
                 server_dashboard.append(buttons);
@@ -32,15 +32,15 @@
             var buttons = $('<ul id="buttons">');
             buttons.addClass('clr').append(server['name']);
             buttons.append($("<li>").attr("id", "refresh").
-                        append($("<a>").attr("link", "#").attr("onClick", "refresh(" + id + ")").html('&nbsp;'))).
+                        append($("<a>").attr("link", "javascript:;").attr("onClick", "refresh(" + id + ")").html('&nbsp;'))).
                     append($("<li>").attr("id", "restart_all").
-                        append($("<a>").attr("link", "#").attr("onClick", "control_server(" + id + ", 'restart_all')").html("&nbsp;"))).
+                        append($("<a>").attr("link", "javascript:;").attr("onClick", "control_server(" + id + ", 'restart_all')").html("&nbsp;"))).
                     append($("<li>").attr("id", "stop_all").
-                        append($("<a>").attr("link", "#").attr("onClick", "control_server(" + id + ", 'stop_all')").html("&nbsp;")));
+                        append($("<a>").attr("link", "javascript:;").attr("onClick", "control_server(" + id + ", 'stop_all')").html("&nbsp;")));
 
 
-                    // '<li id="restart_all"><a href="#" onClick=control_server(' + id + ', "restart_all")>&nbsp;</li>'+
-                    // '<li id="stop_all"><a href="#" onClick=control_server(' + id + ', "stop_all")>&nbsp;</a></li>'+
+                    // '<li id="restart_all"><a href="javascript:;" onClick=control_server(' + id + ', "restart_all")>&nbsp;</li>'+
+                    // '<li id="stop_all"><a href="javascript:;" onClick=control_server(' + id + ', "stop_all")>&nbsp;</a></li>'+
                     // '<li id="machine_name"><a href="index.html?action=stopall">&nbsp;'+server['name']+'</a></li>';
             var table = $("<table>").attr('cellspacing','0');
             var thead = $("<thead>").
@@ -68,12 +68,12 @@
                 row += "<td class='name'>"+program["human_name"]+"</td>";
                 if (program['state'] == "{{ constants.running }}"){
                     row += "<td class='action'><ul>";
-                    row += "<li><a href='#' onClick=control_program("+id+",'"+program['id']+"','stop')>stop</li>";
-                    row += "<li><a href='#' onClick=control_program("+id+",'"+program['id']+"','restart')>restart</li>";
+                    row += "<li><a href='javascript:;"+id+",'"+program['id']+"','stop')>stop</li>";
+                    row += "<li><a href='javascript:;"+id+",'"+program['id']+"','restart')>restart</li>";
                     row += "</ul></td>";
                 } else {
                     row += "<td class='action'><ul>";
-                    row += "<li><a href='#' onClick=control_program("+id+",'"+program['id']+"','start')>start</li>";
+                    row += "<li><a href='javascript:;"+id+",'"+program['id']+"','start')>start</li>";
                     row += "</ul></td>";
                 }
                 table.append($("<tr>"+row+"</tr>"));
